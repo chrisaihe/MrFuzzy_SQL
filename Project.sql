@@ -1,23 +1,8 @@
--- ASSIGNMENTS SO FAR:
--- FINDING TOP TRAFFIC SOURCES; 
--- TRAFFIC SOURCE CONVERSION; 
--- TRAFFIC SOURCE TRENDING; 
--- BID OPTIMIZATION FOR PAID TRAFFIC;
--- TRENDING W/ GRANULAR SEGMENTS
--- FINDING TOP WEBSITE PAGES
--- FINDING TOP ENTRY PAGES
--- CALCULATING BOUNCE RATES
--- ANALYZING LANDING PAGE TESTS
--- LANDING PAGE TREND ANALYSIS
--- BUILDING CONVERSION FUNNELS
--- ANALYZING CONVERSION FUNNEL TESTS
-
 select * from website_sessions;
 select * from website_pageviews;
 select * from orders;
 
-/* 1. gsearch seems to be the biggest driver of our business. Could you pull monthly trends for gsearch sessions and orders
-so that we can showcase the growth there?
+/* 1. Pull monthly trends for gsearch sessions and orders to showcase the growth there?
 */
 
 select month(website_sessions.created_at) as months,
@@ -33,8 +18,7 @@ and website_sessions.created_at < '2012-11-27'
 group by 1
 ;
 
-/* 2. Next, it would be great to see a similar monthly trend for gsearch, but this time splitting out nonbrand
-and brand campaigns separately. I am wondering if brand is picking up at all. If so, this is a good story to tell
+/* 2. Show monthly trend for gsearch splitting it out by nonbrand and brand campaigns separately.
 */
 
 SELECT 
@@ -58,8 +42,7 @@ WHERE
 GROUP BY 1;
 
 
-/* 3. While we're on gsearch, could you dive into nonbrand, and pull monthly sessions and orders split by device type?
-I want to flex our analytical muscles a little and show the board we really know our traffic sources. 
+/* 3. Pull monthly sessions and orders split by device type for gsearch nonbrand.
 */
 
 SELECT 
@@ -83,11 +66,10 @@ WHERE   website_sessions.utm_source = 'gsearch'
 GROUP BY 1;
 
 
-/* 4. I'm worried that one of our more pessimistic board members may be conncerned about the large % of traffic from
-gsearch. Can you pull monthly trends for gsearch, alongside monthly trends for each of our other channels?
+/* 4. Pull monthly trends for gsearch, alongside monthly trends for other channels.
 */
 
--- first, finding the various utm sources and referers to see the traffic we're getting
+-- first, finding the various utm sources and referers to see the traffic 
 
 SELECT DISTINCT
     utm_source, 
@@ -116,10 +98,11 @@ WHERE
     website_sessions.created_at < '2012-11-27'
 GROUP BY 1
 ORDER BY 1 ASC;
+						   
 
-/* 5. I'd like to tell the story of our website performcance improvements over the course of the first 8 months.
-COULD YOU PULL SESSION TO ORDER CONVERSION RATES, BY MONTH?
+/* 5. Pull session to order conversion rates by month.
 */
+						   
 
 SELECT 
     MONTH(website_sessions.created_at) AS months,
@@ -135,17 +118,15 @@ FROM
 WHERE
     website_sessions.created_at < '2012-11-27'
 GROUP BY 1;
+	    
 
-/* 6. for the gsearch lander test, please estimate the revenue that test earned us 
-(Hint: Look at the increase in CVR from the test (Jun 19 - Jul 28), and 
-use nonbrand sessions and revenue since then to calculate the incremental value)
+/* 6. Estimate the revenue that gsearch lander test earned us.
 */
+	    
 
 -- first, look for the first pageview id for when /lander-1 was used
--- second, create a temporary table for bringing in the landing page 
--- using when /lander was first used for each session after that 
--- third, create a temporary table left joining orders to the previously 
--- created temporary table matching landing page to sessions and orders
+-- second, create a temporary table for bringing in the landing page using when /lander was first used for each session after that 
+-- third, create a temporary table left joining orders to the previously created temporary table matching landing page to sessions and orders
 -- fourth, get the conversion rate for each landing page
 -- fifth, find the last session for when /home was visited 
 -- sixth, count the number of sessions since /lander-1 began been used 
@@ -159,7 +140,7 @@ FROM
 WHERE
     pageview_url = '/lander-1';
 
--- for this step, we'll find the first pageview id
+-- for this step, find the first pageview id
 
 -- secondly, create a temporary table for bringing in the landing page 
 -- using when /lander was first used for each session after that 
@@ -180,24 +161,10 @@ FROM
        -- AND website_pageviews.pageview_url IN ('/home' , '/lander-1')
 GROUP BY website_pageviews.website_session_id;
 
--- I personally merged the query above and below into one(above) to shorten it
 
--- next, we'll bring in the landing page to each session, like last time, but restricting to home or lander-1 this time
+-- next, bring in the landing page to each session, like last time, but restricting to home or lander-1 this time
 
-/*create temporary table nonbrand_test_sessions_w_landing_pg;
-select
-	first_test_pvs.website_session_id,
-    website_pageviews.pageview_url as landing_page
-from first_test_pvs
-	left join website_pageviews
-		on website_pageviews.website_pageview_id = first_test_pvs.min_pageview_id
-where website_pageviews.pageview_url in ('/home', '/lander-1');
-*/
 
--- then we make a table to bring in orders
-
--- thirdly, create a temporary table left joining orders to the previously 
--- created temporary table matching landing page to sessions and orders
 
 create temporary table nonbrand_test_sessions_w_orders;
 SELECT 
@@ -212,6 +179,7 @@ FROM
 -- to find the difference between conversion rates
 
 -- fourthly, get the conversion rate for each landing page
+	    
 SELECT 
     landing_page,
     COUNT(DISTINCT website_session_id) AS sessions,
@@ -260,8 +228,7 @@ WHERE
 
 
 
-/* 7. for the landing page test you analyzed previously, it would be great to show a full conversion funnel from 
-each of the two pages to orders. You can use the same time period you analyzed last time (Jun 19 - Jul 28)
+/* 7. Show a full conversion funnel from each of the two pages to orders. 
 */
 
 -- STEP 1: select all pageviews for relevant sessions
@@ -414,9 +381,7 @@ GROUP BY 1;
 
 
 
-/* 8. I'd love for you to quantify the impact of our billing test, as well. Please analyze the lift generated from the 
-test (Sep 10 - Nov 10), in terms of revenue per billing page session, and then pull the number of billing page sessions
-for the past month to understand monthly impact. 
+/* 8. Pull the number of billing page sessions for the past month to understand monthly impact. 
 */
 
 SELECT 
